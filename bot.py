@@ -1,7 +1,8 @@
+
 import os
 import discord
 from discord.ext import commands
-from keep_alive import keep_alive  # Gọi hàm giữ sống từ file keep_alive.py
+from keep_alive import keep_alive
 
 intents = discord.Intents.default()
 intents.voice_states = True
@@ -13,8 +14,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f'Đã đăng nhập thành công: {bot.user}')
     
-    # ID kênh thoại bạn muốn bot treo (Nhớ bật Developer Mode trên Discord để chuột phải copy ID phòng voice)
-    voice_channel_id = 1538846775853449307 # <-- Thay ID phòng voice của bạn vào đây
+    # THAY ID PHÒNG VOICE CỦA BẠN VÀO ĐÂY (giữ nguyên dạng số)
+    voice_channel_id = 1538846775853449307
     
     channel = bot.get_channel(voice_channel_id)
     if channel and isinstance(channel, discord.VoiceChannel):
@@ -29,8 +30,12 @@ async def on_ready():
     else:
         print('Không tìm thấy kênh thoại hợp lệ!')
 
-# Chạy web server ngầm trước khi bật bot
+# Khởi động web server ngầm
 keep_alive()
 
-# Lấy Token từ biến môi trường (Bảo mật tuyệt đối) hoặc dán trực tiếp token vào đây
-bot.run(os.environ.get('TOKEN'))
+# Lấy token từ Railway (bắt buộc tên biến môi trường ở Railway phải là TOKEN)
+token = os.environ.get('TOKEN')
+if not token:
+    print("LỖI: Chưa cấu hình biến TOKEN trên Railway!")
+else:
+    bot.run(token)
