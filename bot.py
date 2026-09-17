@@ -38,7 +38,7 @@ async def on_message(message):
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
-            "gif": "https://media4.giphy.com/media/ERYp5uZ8seh9DvF0SH/giphy.gif" # Đã rút gọn link
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3p5ZTRqdmt4Ym9seHBpNnpxYnp1YjV6eDE1ZHRpNnF3Zm1rbHpwbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5zU8seh9DvF0SH/giphy.gif" # Đã rút gọn link
         },
         "ngu": {
             "text": "0 toxic",
