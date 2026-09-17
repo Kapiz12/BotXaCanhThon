@@ -29,25 +29,23 @@ async def on_ready():
             print(f'Lỗi kết nối voice: {e}')
     else:
         print('Không tìm thấy kênh thoại hợp lệ!')
-
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
     # Danh sách từ khóa và câu trả lời kèm link GIF
-    # (Bạn có thể thay thế link GIF trong ngoặc kép bằng bất kỳ link ảnh GIF nào bạn thích)
     responses = {
-        "ngủ ngoan nhó": {
+        "ngủ ngoan nhớ": {
             "text": "gút nightt",
-            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExanRyZHZhc2dnMGxkM2wxY3I4N2Q2NjFpdHRtM2o0MjBteWhkdWl5eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5zU8seh9DvF0SH/giphy.gif"
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5uZ8seh9DvF0SH/giphy.gif"
         },
         "ngu": {
             "text": "0 toxic",
-            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHRiYTI1Z215d2JqMjRibnl6MnJ0dnZqZTQ1dmgyd2RmeWkwcWN3aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jrd4qbTLztjuc6QPtJ/giphy.gif"
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
         "ilovu": {
-            "text": "iu Han thé nhò",
+            "text": "iu Han thế nhò",
             "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xE8oTRMyuYLmhFMQkl/giphy.gif"
         }
     }
@@ -56,11 +54,16 @@ async def on_message(message):
     
     if user_text in responses:
         data = responses[user_text]
-        # Gửi cả chữ lẫn link GIF (Discord sẽ tự động render thành khung động)
-        await message.channel.send(f"{data['text']}\n{data['gif']}")
+        
+        # Gửi chữ trước
+        await message.channel.send(data['text'])
+        
+        # Tạo Embed để hiển thị ảnh GIF ẩn link
+        embed = discord.Embed(color=discord.Color.green())
+        embed.set_image(url=data['gif'])
+        await message.channel.send(embed=embed)
 
     await bot.process_commands(message)
-
 @bot.event
 async def on_voice_state_update(member, before, after):
     if member.id == bot.user.id:
