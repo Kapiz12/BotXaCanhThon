@@ -40,15 +40,15 @@ async def on_message(message):
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
-            "gif": "https://cdn.discordapp.com/emojis/1550109120189693952.webp?size=28&animated=true"
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExanRyZHZhc2dnMGxkM2wxY3I4N2Q2NjFpdHRtM2o0MjBteWhkdWl5eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5zU8seh9DvF0SH/giphy.gif"
         },
         "ngu": {
             "text": "0 toxic",
-            "gif": "https://cdn.discordapp.com/emojis/1550109396489609236.webp?size=28&animated=true"
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHRiYTI1Z215d2JqMjRibnl6MnJ0dnZqZTQ1dmgyd2RmeWkwcWN3aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
         "ilovu": {
             "text": "iu Han thé nhò",
-            "gif": "https://cdn.discordapp.com/emojis/1550110796502278185.webp?size=28&animated=true"
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xE8oTRMyuYLmhFMQkl/giphy.gif"
         }
     }
 
