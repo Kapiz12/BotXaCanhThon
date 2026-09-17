@@ -1,2 +1,11 @@
 [phases.setup]
-nixPkgs = ["python3", "libffi", "opus"]
+nixPkgs = ["python311", "libffi", "opus", "gcc"]
+
+[phases.install]
+cmds = ["python -m venv /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = ". /opt/venv/bin/activate && python bot.py"
