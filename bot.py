@@ -34,19 +34,19 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Danh sách từ khóa và câu trả lời kèm link GIF
+    # Danh sách từ khóa, câu trả lời và link GIF rút gọn, sạch sẽ
     responses = {
         "ngủ ngoan nhớ": {
             "text": "gút nightt",
-            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5uZ8seh9DvF0SH/giphy.gif"
+            "gif": "https://media4.giphy.com/media/ERYp5uZ8seh9DvF0SH/giphy.gif" # Đã rút gọn link
         },
         "ngu": {
             "text": "0 toxic",
-            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jrd4qbTLztjuc6QPtJ/giphy.gif"
+            "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
         "ilovu": {
             "text": "iu Han thế nhò",
-            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTFlNHFiZzVlYzJicGVtdmMyMmxiODk2eHluYWx1bTR3ODBtcmQ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xE8oTRMyuYLmhFMQkl/giphy.gif"
+            "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
         }
     }
 
@@ -55,12 +55,15 @@ async def on_message(message):
     if user_text in responses:
         data = responses[user_text]
         
-        # Gửi chữ trước
+        # 1. Gửi tin nhắn văn bản bình thường
         await message.channel.send(data['text'])
         
-        # Tạo Embed để hiển thị ảnh GIF ẩn link
+        # 2. Tạo Embed để nhúng ảnh GIF (giúp ẩn link xanh rườm rà)
+        # Bạn có thể đổi discord.Color.green() thành màu khác tùy thích
         embed = discord.Embed(color=discord.Color.green())
         embed.set_image(url=data['gif'])
+        
+        # 3. Gửi embed đi
         await message.channel.send(embed=embed)
 
     await bot.process_commands(message)
