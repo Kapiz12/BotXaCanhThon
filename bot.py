@@ -1,5 +1,5 @@
-
 import os
+import asyncio
 import discord
 from discord.ext import commands
 from keep_alive import keep_alive
@@ -14,8 +14,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f'Đã đăng nhập thành công: {bot.user}')
     
-    # THAY ID PHÒNG VOICE CỦA BẠN VÀO ĐÂY (giữ nguyên dạng số)
-    voice_channel_id = 1538846775853449307
+    # ID phòng voice của bạn
+    voice_channel_id = 1538846775853449307 
     
     channel = bot.get_channel(voice_channel_id)
     if channel and isinstance(channel, discord.VoiceChannel):
@@ -29,58 +29,57 @@ async def on_ready():
             print(f'Lỗi kết nối voice: {e}')
     else:
         print('Không tìm thấy kênh thoại hợp lệ!')
-else:
-        print('Không tìm thấy kênh thoại hợp lệ!')
 
-else:
-            print('Không tìm thấy kênh thoại hợp lệ!')
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
 
-# --- DÁN ĐOẠN CODE NÀY VÀO ĐÂY ---
+    # Danh sách từ khóa và câu trả lời kèm link GIF
+    # (Bạn có thể thay thế link GIF trong ngoặc kép bằng bất kỳ link ảnh GIF nào bạn thích)
+    responses = {
+        "ngủ ngoan nhó": {
+            "text": "gút nightt",
+            "gif": "https://cdn.discordapp.com/emojis/1550109120189693952.webp?size=28&animated=true"
+        },
+        "ngu": {
+            "text": "0 toxic",
+            "gif": "https://cdn.discordapp.com/emojis/1550109396489609236.webp?size=28&animated=true"
+        },
+        "ilovu": {
+            "text": "iu Han thé nhò",
+            "gif": "https://cdn.discordapp.com/emojis/1550110796502278185.webp?size=28&animated=true"
+        }
+    }
+
+    user_text = message.content.lower().strip()
+    
+    if user_text in responses:
+        data = responses[user_text]
+        # Gửi cả chữ lẫn link GIF (Discord sẽ tự động render thành khung động)
+        await message.channel.send(f"{data['text']}\n{data['gif']}")
+
+    await bot.process_commands(message)
+
 @bot.event
 async def on_voice_state_update(member, before, after):
-    # Kiểm tra xem người bị thay đổi trạng thái có phải là bot của mình không
     if member.id == bot.user.id:
-        # Nếu bot bị ngắt kết nối khỏi phòng voice mà không chủ động rời đi
         if before.channel is not None and after.channel is None:
             print("Bot bị rớt khỏi phòng voice, đang tự động kết nối lại...")
-            await asyncio.sleep(3) # Đợi 3 giây ổn định mạng
+            await asyncio.sleep(3)
             try:
-                voice_channel_id = 1538846775853449307 # ID phòng voice của bạn
+                voice_channel_id = 1538846775853449307
                 channel = bot.get_channel(voice_channel_id)
                 if channel:
                     await channel.connect()
                     print("Đã kết nối lại vào phòng voice thành công!")
             except Exception as e:
                 print(f"Lỗi tự động kết nối lại voice: {e}")
-# ----------------------------------
 
 # Khởi động web server ngầm
 keep_alive()
-# --- DÁN ĐOẠN CODE NÀY VÀO ĐÂY ---
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
 
-    responses = {
-        "xin chào": "Chào bạn nhé! Chúc bạn một ngày tốt lành.",
-        "luật server là gì": "Bạn vui lòng đọc kỹ nội quy ở kênh #rules nhé!",
-        "bot ơi": "Dạ, mình đây! Mình đang túc trực 24/7 nè.",
-    }
-
-    user_text = message.content.lower().strip()
-    if user_text in responses:
-        await message.channel.send(responses[user_text])
-
-    await bot.process_commands(message)
-# ----------------------------------
-
-# Khởi động web server ngầm
-keep_alive()
-# Khởi động web server ngầm
-keep_alive()
-
-# Lấy token từ Railway (bắt buộc tên biến môi trường ở Railway phải là TOKEN)
+# Lấy token từ Railway
 token = os.environ.get('TOKEN')
 if not token:
     print("LỖI: Chưa cấu hình biến TOKEN trên Railway!")
