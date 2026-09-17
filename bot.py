@@ -36,7 +36,7 @@ async def on_message(message):
 
     # Danh sách từ khóa, câu trả lời và link GIF rút gọn, sạch sẽ
     responses = {
-        "ngủ ngoan nhớ": {
+        "ngủ ngoan nhó": {
             "text": "gút nightt",
             "gif": "https://media4.giphy.com/media/ERYp5uZ8seh9DvF0SH/giphy.gif" # Đã rút gọn link
         },
