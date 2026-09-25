@@ -48,6 +48,11 @@ async def on_message(message):
             "text": "iu Han thế nhò",
             "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
         }
+        },
+        "hay": {
+            "text": "=))",
+            "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
+        }
     }
 
     user_text = message.content.lower().strip()
