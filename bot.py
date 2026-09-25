@@ -29,16 +29,17 @@ async def on_ready():
             print(f'Lỗi kết nối voice: {e}')
     else:
         print('Không tìm thấy kênh thoại hợp lệ!')
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Danh sách từ khóa, câu trả lời và link GIF rút gọn, sạch sẽ
+    # Danh sách từ khóa, câu trả lời và link GIF
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
-            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3p5ZTRqdmt4Ym9seHBpNnpxYnp1YjV6eDE1ZHRpNnF3Zm1rbHpwbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5zU8seh9DvF0SH/giphy.gif" # Đã rút gọn link
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3p5ZTRqdmt4Ym9seHBpNnpxYnp1YjV6eDE1ZHRpNnF3Zm1rbHpwbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5zU8seh9DvF0SH/giphy.gif"
         },
         "ngu": {
             "text": "0 toxic",
@@ -47,13 +48,12 @@ async def on_message(message):
         "ilovu": {
             "text": "iu Han thế nhò",
             "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
-        }
         },
         "hay": {
             "text": "=))",
             "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
         }
-    }
+    } # Đóng ngoặc đúng chuẩn cho responses ở đây
 
     user_text = message.content.lower().strip()
     
@@ -64,7 +64,6 @@ async def on_message(message):
         await message.channel.send(data['text'])
         
         # 2. Tạo Embed để nhúng ảnh GIF (giúp ẩn link xanh rườm rà)
-        # Bạn có thể đổi discord.Color.green() thành màu khác tùy thích
         embed = discord.Embed(color=discord.Color.green())
         embed.set_image(url=data['gif'])
         
@@ -72,6 +71,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 
     await bot.process_commands(message)
+
 @bot.event
 async def on_voice_state_update(member, before, after):
     if member.id == bot.user.id:
