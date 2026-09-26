@@ -96,10 +96,10 @@ async def on_voice_state_update(member, before, after):
     if not room or not isinstance(room, discord.VoiceChannel):
         return
 
-    room_name = room.name # Lấy tên phòng voice hiện tại (ví dụ: "Chợ lớn")
+    room_name = room.name # Lấy tên phòng voice (ví dụ: "Chợ lớn")
 
-    # Lấy khung chat tích hợp sẵn bên trong phòng voice đó
-    text_chat = room.text_channel
+    # Lấy đúng khung chat tích hợp sẵn trong phòng voice đó (Voice Channel Text Chat)
+    text_chat = getattr(room, 'text_channel', None)
     if not text_chat:
         return
 
