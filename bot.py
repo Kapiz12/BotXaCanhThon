@@ -50,7 +50,7 @@ async def on_message(message):
             "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
         }
         "chợ lớn": {
-            "text": "Chợ lớn thuộc quyền sở hữu của Hải Hưng",
+            "text": "Chợ lớn đang được Hưng đóng chiếm.(Canh cổng)",
         }
     }
 
