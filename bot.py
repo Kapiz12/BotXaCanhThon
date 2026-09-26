@@ -10,14 +10,14 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# ID phòng voice của bạn
+VOICE_CHANNEL_ID = 1553262077878075453 
+
 @bot.event
 async def on_ready():
     print(f'Đã đăng nhập thành công: {bot.user}')
     
-    # ID phòng voice của bạn
-    voice_channel_id = 1553262077878075453 
-    
-    channel = bot.get_channel(voice_channel_id)
+    channel = bot.get_channel(VOICE_CHANNEL_ID)
     if channel and isinstance(channel, discord.VoiceChannel):
         try:
             if existing_vc := discord.utils.get(bot.voice_clients, guild=channel.guild):
@@ -45,15 +45,11 @@ async def on_message(message):
             "text": "0 toxic",
             "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
-        "ilovu": {
-            "text": "iu Han thế nhò",
-            "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
-        },
         "hay": {
             "text": "=))",
             "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
         }
-    } # Đóng ngoặc đúng chuẩn cho responses ở đây
+    }
 
     user_text = message.content.lower().strip()
     
@@ -74,18 +70,43 @@ async def on_message(message):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
+    # 1. Xử lý trường hợp chính con Bot bị rớt khỏi phòng voice
     if member.id == bot.user.id:
         if before.channel is not None and after.channel is None:
             print("Bot bị rớt khỏi phòng voice, đang tự động kết nối lại...")
             await asyncio.sleep(3)
             try:
-                voice_channel_id = 1553262077878075453
-                channel = bot.get_channel(voice_channel_id)
+                channel = bot.get_channel(VOICE_CHANNEL_ID)
                 if channel:
                     await channel.connect()
                     print("Đã kết nối lại vào phòng voice thành công!")
             except Exception as e:
                 print(f"Lỗi tự động kết nối lại voice: {e}")
+        return
+
+    # Bỏ qua nếu người thay đổi trạng thái là bot khác
+    if member.bot:
+        return
+
+    # 2. Xử lý thông báo User Join / Out cho phòng voice cụ thể
+    room = bot.get_channel(VOICE_CHANNEL_ID)
+    if not room:
+        return
+
+    # Tìm một kênh text bất kỳ trong server để bot gửi tin nhắn thông báo (thường là kênh đầu tiên gửi được)
+    text_channel = next((ch for ch in room.guild.text_channels if ch.permissions_for(room.guild.me).send_messages), None)
+    if not text_channel:
+        return
+
+    room_name = room.name # Lấy tên phòng voice hiện tại (ví dụ: "Chợ lớn")
+
+    # Trường hợp 1: Người dùng JOIN vào phòng
+    if before.channel != room and after.channel == room:
+        await text_channel.send(f"{room_name} xin chào {member.mention}")
+
+    # Trường hợp 2: Người dùng OUT khỏi phòng
+    elif before.channel == room and after.channel != room:
+        await text_channel.send(f"{room_name} tạm biệt {member.mention}")
 
 # Khởi động web server ngầm
 keep_alive()
