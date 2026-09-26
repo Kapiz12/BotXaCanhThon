@@ -15,7 +15,7 @@ async def on_ready():
     print(f'Đã đăng nhập thành công: {bot.user}')
     
     # ID phòng voice của bạn
-    voice_channel_id = 1538846775853449307 
+    voice_channel_id = 1553262077878075453 
     
     channel = bot.get_channel(voice_channel_id)
     if channel and isinstance(channel, discord.VoiceChannel):
@@ -79,7 +79,7 @@ async def on_voice_state_update(member, before, after):
             print("Bot bị rớt khỏi phòng voice, đang tự động kết nối lại...")
             await asyncio.sleep(3)
             try:
-                voice_channel_id = 11553262077878075453
+                voice_channel_id = 1553262077878075453
                 channel = bot.get_channel(voice_channel_id)
                 if channel:
                     await channel.connect()
