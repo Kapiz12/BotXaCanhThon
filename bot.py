@@ -35,7 +35,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Danh sách từ khóa và câu trả lời (Có cái có gif, có cái chỉ có text)
+    # Danh sách từ khóa và câu trả lời
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
@@ -46,7 +46,7 @@ async def on_message(message):
             "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
         "ilovu": {
-            "text": "iu Han thế nhò",
+            "text": "iu thíii",
             "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
         },
         "hay": {
@@ -55,7 +55,6 @@ async def on_message(message):
         },
         "chợ lớn": {
             "text": "Chợ lớn đang được Hưng đóng chiếm.(Canh cổng)"
-            # Không cần khai báo "gif" ở đây vì bạn không muốn dùng gif
         }
     }
 
@@ -64,10 +63,8 @@ async def on_message(message):
     if user_text in responses:
         data = responses[user_text]
         
-        # 1. Gửi tin nhắn văn bản trước
         await message.channel.send(data['text'])
         
-        # 2. Kiểm tra xem từ khóa này có định nghĩa "gif" hay không, nếu có mới tạo Embed gửi ảnh
         if "gif" in data:
             embed = discord.Embed(color=discord.Color.green())
             embed.set_image(url=data['gif'])
@@ -91,28 +88,28 @@ async def on_voice_state_update(member, before, after):
                 print(f"Lỗi tự động kết nối lại voice: {e}")
         return
 
-    # Bỏ qua bot khác
+    # Bỏ qua các bot khác
     if member.bot:
         return
 
-    # 2. Xử lý thông báo User Join / Out cho phòng voice cụ thể
     room = bot.get_channel(VOICE_CHANNEL_ID)
-    if not room:
+    if not room or not isinstance(room, discord.VoiceChannel):
         return
 
-    text_channel = next((ch for ch in room.guild.text_channels if ch.permissions_for(room.guild.me).send_messages), None)
-    if not text_channel:
+    room_name = room.name # Lấy tên phòng voice hiện tại (ví dụ: "Chợ lớn")
+
+    # Lấy khung chat tích hợp sẵn bên trong phòng voice đó
+    text_chat = room.text_channel
+    if not text_chat:
         return
 
-    room_name = room.name # Lấy tên phòng voice (ví dụ: "Chợ lớn")
-
-    # Người dùng JOIN vào phòng
+    # Trường hợp 1: Người dùng JOIN vào phòng voice
     if before.channel != room and after.channel == room:
-        await text_channel.send(f"{room_name} xin chào {member.mention}")
+        await text_chat.send(f"{room_name} xin chào {member.mention}")
 
-    # Người dùng OUT khỏi phòng
+    # Trường hợp 2: Người dùng OUT khỏi phòng voice
     elif before.channel == room and after.channel != room:
-        await text_channel.send(f"{room_name} tạm biệt {member.mention}")
+        await text_chat.send(f"{room_name} tạm biệt {member.mention}")
 
 # Khởi động web server ngầm
 keep_alive()
