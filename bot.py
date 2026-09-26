@@ -35,7 +35,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Danh sách từ khóa và câu trả lời
+    # Danh sách từ khóa và câu trả lời (giữ nguyên tính năng chat & gif bình thường của bạn)
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
@@ -46,7 +46,7 @@ async def on_message(message):
             "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
         "ilovu": {
-            "text": "iu thíii",
+            "text": "iu Han thế nhò",
             "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
         },
         "hay": {
@@ -94,22 +94,40 @@ async def on_voice_state_update(member, before, after):
 
     room = bot.get_channel(VOICE_CHANNEL_ID)
     if not room or not isinstance(room, discord.VoiceChannel):
+        print(f"Không tìm thấy room voice với ID: {VOICE_CHANNEL_ID}")
         return
 
-    room_name = room.name # Lấy tên phòng voice (ví dụ: "Chợ lớn")
+    room_name = room.name # "Chợ lớn"
 
-    # Lấy đúng khung chat tích hợp sẵn trong phòng voice đó (Voice Channel Text Chat)
+    # Lấy khung chat tích hợp của phòng voice. 
+    # Nếu server của bạn dùng tính năng voice chat mới, lệnh này sẽ trỏ thẳng vào đúng chỗ.
     text_chat = getattr(room, 'text_channel', None)
+    
     if not text_chat:
+        print(f"Cảnh báo: Phòng voice '{room_name}' không bật sẵn text_channel, đang dùng phương án dự phòng...")
+        # Dự phòng: tìm kiếm kênh text thường có tên khớp với phòng voice trong server
+        target_name = room_name.lower().replace(" ", "-")
+        text_chat = discord.utils.get(room.guild.text_channels, name=target_name)
+
+    if not text_chat:
+        print("Lỗi: Không tìm thấy bất kỳ khung chat nào tương thích để gửi thông báo join/out!")
         return
 
     # Trường hợp 1: Người dùng JOIN vào phòng voice
     if before.channel != room and after.channel == room:
-        await text_chat.send(f"{room_name} xin chào {member.mention}")
+        try:
+            await text_chat.send(f"{room_name} xin chào {member.mention}")
+            print(f"Đã gửi thông báo Join cho {member.name}")
+        except Exception as e:
+            print(f"Lỗi khi gửi tin nhắn Join: {e}")
 
     # Trường hợp 2: Người dùng OUT khỏi phòng voice
     elif before.channel == room and after.channel != room:
-        await text_chat.send(f"{room_name} tạm biệt {member.mention}")
+        try:
+            await text_chat.send(f"{room_name} tạm biệt {member.mention}")
+            print(f"Đã gửi thông báo Out cho {member.name}")
+        except Exception as e:
+            print(f"Lỗi khi gửi tin nhắn Out: {e}")
 
 # Khởi động web server ngầm
 keep_alive()
