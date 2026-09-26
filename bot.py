@@ -49,6 +49,9 @@ async def on_message(message):
             "text": "=))",
             "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
         }
+        "chợ lớn": {
+            "text": "Chợ lớn thuộc quyền sở hữu của Hải Hưng",
+        }
     }
 
     user_text = message.content.lower().strip()
