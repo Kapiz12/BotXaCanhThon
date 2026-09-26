@@ -35,7 +35,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Danh sách từ khóa, câu trả lời và link GIF
+    # Danh sách từ khóa và câu trả lời (Có cái có gif, có cái chỉ có text)
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
@@ -45,12 +45,17 @@ async def on_message(message):
             "text": "0 toxic",
             "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"
         },
+        "ilovu": {
+            "text": "iu Han thế nhò",
+            "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
+        },
         "hay": {
             "text": "=))",
             "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
-        }
+        },
         "chợ lớn": {
-            "text": "Chợ lớn đang được Hưng đóng chiếm.(Canh cổng)",
+            "text": "Chợ lớn đang được Hưng đóng chiếm.(Canh cổng)"
+            # Không cần khai báo "gif" ở đây vì bạn không muốn dùng gif
         }
     }
 
@@ -59,15 +64,14 @@ async def on_message(message):
     if user_text in responses:
         data = responses[user_text]
         
-        # 1. Gửi tin nhắn văn bản bình thường
+        # 1. Gửi tin nhắn văn bản trước
         await message.channel.send(data['text'])
         
-        # 2. Tạo Embed để nhúng ảnh GIF (giúp ẩn link xanh rườm rà)
-        embed = discord.Embed(color=discord.Color.green())
-        embed.set_image(url=data['gif'])
-        
-        # 3. Gửi embed đi
-        await message.channel.send(embed=embed)
+        # 2. Kiểm tra xem từ khóa này có định nghĩa "gif" hay không, nếu có mới tạo Embed gửi ảnh
+        if "gif" in data:
+            embed = discord.Embed(color=discord.Color.green())
+            embed.set_image(url=data['gif'])
+            await message.channel.send(embed=embed)
 
     await bot.process_commands(message)
 
@@ -87,7 +91,7 @@ async def on_voice_state_update(member, before, after):
                 print(f"Lỗi tự động kết nối lại voice: {e}")
         return
 
-    # Bỏ qua nếu người thay đổi trạng thái là bot khác
+    # Bỏ qua bot khác
     if member.bot:
         return
 
@@ -96,18 +100,17 @@ async def on_voice_state_update(member, before, after):
     if not room:
         return
 
-    # Tìm một kênh text bất kỳ trong server để bot gửi tin nhắn thông báo (thường là kênh đầu tiên gửi được)
     text_channel = next((ch for ch in room.guild.text_channels if ch.permissions_for(room.guild.me).send_messages), None)
     if not text_channel:
         return
 
-    room_name = room.name # Lấy tên phòng voice hiện tại (ví dụ: "Chợ lớn")
+    room_name = room.name # Lấy tên phòng voice (ví dụ: "Chợ lớn")
 
-    # Trường hợp 1: Người dùng JOIN vào phòng
+    # Người dùng JOIN vào phòng
     if before.channel != room and after.channel == room:
         await text_channel.send(f"{room_name} xin chào {member.mention}")
 
-    # Trường hợp 2: Người dùng OUT khỏi phòng
+    # Người dùng OUT khỏi phòng
     elif before.channel == room and after.channel != room:
         await text_channel.send(f"{room_name} tạm biệt {member.mention}")
 
