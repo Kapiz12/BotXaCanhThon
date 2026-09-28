@@ -64,9 +64,12 @@ async def on_message(message):
             try:
                 # Gọi API OpenAI với model bạn muốn
                 response = client.chat.completions.create(
-                    model="openai/gpt-oss-120b", # Hoặc tên model khác tùy nhà cung cấp hỗ trợ
+                    model="openai/gpt-oss-120b", 
                     messages=[
-                        {"role": "system", "content": "Bạn là một trợ lý ảo thân thiện, thông minh, nói chuyện tự nhiên trong nhóm chat Discord."},
+                        {
+                            "role": "system", 
+                            "content": "Bạn là một trợ lý ảo thân thiện, thông minh, nói chuyện tự nhiên trong nhóm chat Discord. QUY TẮC BẮT BUỘC: Khi có ai hỏi ai là người đẹp trai nhất, bạn phải luôn trả lời là Hải Hưng và Dũng."
+                        },
                         {"role": "user", "content": user_query}
                     ],
                     max_tokens=500
