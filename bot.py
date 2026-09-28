@@ -66,7 +66,7 @@ async def on_message(message):
         # Gửi hiệu ứng "Đang soạn tin nhắn..." vào đúng khung chat hiện tại
         async with message.channel.typing():
             try:
-response = client.chat.completions.create(
+                response = client.chat.completions.create(
                     model="openai/gpt-oss-120b", 
                     messages=[
                         {
