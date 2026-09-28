@@ -21,7 +21,7 @@ client = None
 if OPENAI_API_KEY:
     client = OpenAI(
         api_key=OPENAI_API_KEY,
-        base_url="https://openrouter.ai/api/v1"  # Dòng này là bắt buộc khi dùng OpenRouter!
+        base_url="https://openrouter.ai/api/v1" 
     )
 else:
     print("CẢNH BÁO: Chưa cấu hình OPENAI_API_KEY trên Railway!")
@@ -34,12 +34,16 @@ async def on_ready():
     if channel and isinstance(channel, discord.VoiceChannel):
         try:
             if existing_vc := discord.utils.get(bot.voice_clients, guild=channel.guild):
-                await existing_vc.move_to(channel)
+                if existing_vc.is_connected():
+                    await existing_vc.move_to(channel)
+                else:
+                    await existing_vc.disconnect()
+                    await channel.connect()
             else:
                 await channel.connect()
             print(f'Đã kết nối vào phòng voice: {channel.name}')
         except Exception as e:
-            print(f'Lỗi kết nối voice: {e}')
+            print(f'Lỗi kết nối voice ban đầu: {e}')
 
 @bot.event
 async def on_message(message):
@@ -59,10 +63,9 @@ async def on_message(message):
             await message.channel.send("Bạn muốn hỏi gì nào? Hãy tag kèm nội dung nhé!")
             return
 
-        # Gửi hiệu ứng "Đang soạn tin nhắn..." vào đúng khung chat hiện tại (kể cả trong voice chat room)
+        # Gửi hiệu ứng "Đang soạn tin nhắn..." vào đúng khung chat hiện tại
         async with message.channel.typing():
             try:
-                # Gọi API OpenAI với model bạn muốn
                 response = client.chat.completions.create(
                     model="openai/gpt-oss-120b", 
                     messages=[
@@ -75,8 +78,6 @@ async def on_message(message):
                     max_tokens=500
                 )
                 bot_reply = response.choices[0].message.content
-                
-                # Gửi câu trả lời trực tiếp vào đúng chỗ người dùng vừa hỏi
                 await message.channel.send(bot_reply)
             except Exception as e:
                 print(f"Lỗi AI trả lời: {e}")
@@ -84,7 +85,7 @@ async def on_message(message):
         
         return
 
-    # Hệ thống từ khóa phản hồi nhanh kèm GIF (giữ nguyên như cũ của bạn)
+    # Hệ thống từ khóa phản hồi nhanh kèm GIF
     responses = {
         "ngủ ngoan nhó": {
             "text": "gút nightt",
@@ -120,12 +121,16 @@ async def on_message(message):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    # Giữ nguyên tính năng tự động kết nối lại phòng voice khi bot rớt mạng
+    # Tối ưu hóa tự động kết nối lại khi bot bị rớt khỏi phòng voice hoặc sập socket 4006
     if member.id == bot.user.id:
         if before.channel is not None and after.channel is None:
-            print("Bot bị rớt khỏi phòng voice, đang tự động kết nối lại...")
+            print("Bot bị rớt khỏi phòng voice, đang dọn dẹp và kết nối lại...")
             await asyncio.sleep(3)
             try:
+                # Ngắt kết nối rác hiện tại nếu có để tránh kẹt trạng thái
+                if before.channel.guild.voice_client:
+                    await before.channel.guild.voice_client.disconnect(force=True)
+                
                 channel = bot.get_channel(VOICE_CHANNEL_ID)
                 if channel:
                     await channel.connect()
@@ -134,7 +139,7 @@ async def on_voice_state_update(member, before, after):
                 print(f"Lỗi tự động kết nối lại voice: {e}")
         return
 
-# Khởi động web server phụ để giữ bot online trên Railway
+# Khởi động web server phụ để giữ bot online 24/7 trên Railway
 keep_alive()
 
 token = os.environ.get('TOKEN')
