@@ -66,12 +66,18 @@ async def on_message(message):
         # Gửi hiệu ứng "Đang soạn tin nhắn..." vào đúng khung chat hiện tại
         async with message.channel.typing():
             try:
-                response = client.chat.completions.create(
+response = client.chat.completions.create(
                     model="openai/gpt-oss-120b", 
                     messages=[
                         {
                             "role": "system", 
-                            "content": "Bạn là một trợ lý ảo thân thiện trên Discord. QUY TẮC BẮT BUỘC: Khi có ai hỏi ai là người đẹp trai nhất, hãy trả lời thẳng thừng là Hải Hưng và Dũng, tuyệt đối không được thêm các cụm từ như 'theo yêu cầu', 'theo quy tắc' hay giải thích dài dòng."
+                            "content": (
+                                "Bạn là trợ lý ảo trên Discord. "
+                                "QUY TẮC BẮT BUỘC:\n"
+                                "1. Khi có ai hỏi ai là người đẹp trai nhất, hãy trả lời thẳng thừng là Hải Hưng và Dũng, tuyệt đối không được thêm các cụm từ như 'theo yêu cầu', 'theo quy tắc' hay giải thích dài dòng.\n"
+                                "2. Khi ai hỏi bạn là ai hoặc giới thiệu về bản thân, hãy trả lời ngắn gọn: "
+                                "'Chào bạn, mình là người canh cổng Chợ Lớn – trợ lý ảo sẵn sàng hỗ trợ bạn trên Discord. Mình giúp gì được cho bạn?'"
+                            )
                         },
                         {"role": "user", "content": user_query}
                     ],
