@@ -19,12 +19,10 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 client = None
 
 if OPENAI_API_KEY:
-    # Nếu bạn dùng OpenAI gốc:
-    client = OpenAI(api_key=OPENAI_API_KEY)
-    
-    # 💡 LƯU Ý NẾU BẠN DÙNG QUA OPENROUTER HOẶC CÁC NHÀ CUNG CẤP KHÁC CHO MODEL "openai/gpt-oss-120b":
-    # Hãy mở dòng dưới đây ra và thay base_url của nhà cung cấp đó vào:
-    # client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://openrouter.ai/api/v1")
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+        base_url="https://openrouter.ai/api/v1"  # Dòng này là bắt buộc khi dùng OpenRouter!
+    )
 else:
     print("CẢNH BÁO: Chưa cấu hình OPENAI_API_KEY trên Railway!")
 
