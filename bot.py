@@ -21,7 +21,7 @@ client = None
 if OPENAI_API_KEY:
     client = OpenAI(
         api_key=OPENAI_API_KEY,
-        base_url="https://openrouter.ai/api/v1" 
+        base_url="https://openrouter.ai/api/v1"  # Bắt buộc khi dùng OpenRouter
     )
 else:
     print("CẢNH BÁO: Chưa cấu hình OPENAI_API_KEY trên Railway!")
@@ -127,13 +127,12 @@ async def on_message(message):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    # Tối ưu hóa tự động kết nối lại khi bot bị rớt khỏi phòng voice hoặc sập socket 4006
+    # Tự động dọn dẹp kết nối cũ và chui lại vào phòng voice khi bị rớt mạng / lỗi socket
     if member.id == bot.user.id:
         if before.channel is not None and after.channel is None:
             print("Bot bị rớt khỏi phòng voice, đang dọn dẹp và kết nối lại...")
             await asyncio.sleep(3)
             try:
-                # Ngắt kết nối rác hiện tại nếu có để tránh kẹt trạng thái
                 if before.channel.guild.voice_client:
                     await before.channel.guild.voice_client.disconnect(force=True)
                 
