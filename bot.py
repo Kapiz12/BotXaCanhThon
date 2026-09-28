@@ -3,8 +3,7 @@ import asyncio
 import discord
 from discord.ext import commands
 from keep_alive import keep_alive
-# import thư viện AI (Ví dụ ở đây dùng google-generativeai)
-import google.generativeai as genai
+from openai import OpenAI
 
 intents = discord.Intents.default()
 intents.voice_states = True
@@ -15,13 +14,19 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # ID phòng voice của bạn
 VOICE_CHANNEL_ID = 1553262077878075453 
 
-# Cấu hình Google Gemini AI (Bạn cần lưu API Key vào biến môi trường GEMINI_API_KEY trên Railway)
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    ai_model = genai.GenerativeModel('gemini-1.5-flash') # Hoặc gemini-pro
+# Cấu hình OpenAI Client (Lấy API Key từ biến môi trường trên Railway)
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+client = None
+
+if OPENAI_API_KEY:
+    # Nếu bạn dùng OpenAI gốc:
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    
+    # 💡 LƯU Ý NẾU BẠN DÙNG QUA OPENROUTER HOẶC CÁC NHÀ CUNG CẤP KHÁC CHO MODEL "openai/gpt-oss-120b":
+    # Hãy mở dòng dưới đây ra và thay base_url của nhà cung cấp đó vào:
+    # client = OpenAI(api_key=OPENAI_API_KEY, base_url="https://openrouter.ai/api/v1")
 else:
-    print("CẢNH BÁO: Chưa cấu hình GEMINI_API_KEY trên Railway!")
+    print("CẢNH BÁO: Chưa cấu hình OPENAI_API_KEY trên Railway!")
 
 @bot.event
 async def on_ready():
@@ -40,45 +45,65 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    # Không để bot tự trả lời tin nhắn của chính nó
     if message.author == bot.user:
         return
 
-    # KIỂM TRA XEM BOT CÓ ĐƯỢC TAG TRONG TIN NHẮN KHÔNG
+    # KHI CÓ NGƯỜI TAG @ CON BOT
     if bot.user in message.mentions:
-        if not GEMINI_API_KEY:
-            await message.channel.send("Chưa cấu hình API Key cho AI trên hệ thống bạn ơi!")
+        if not client:
+            await message.channel.send("Chưa cấu hình OPENAI_API_KEY trên hệ thống bạn ơi!")
             return
 
-        # Lấy nội dung câu hỏi (lọc bỏ phần @mention của bot cho sạch chữ)
+        # Lọc bỏ phần tag bot để lấy nội dung câu hỏi
         user_query = message.content.replace(f'<@!{bot.user.id}>', '').replace(f'<@{bot.user.id}>', '').strip()
         
         if not user_query:
-            await message.channel.send("Bạn muốn hỏi gì nào? Hãy tag kèm câu hỏi nhé!")
+            await message.channel.send("Bạn muốn hỏi gì nào? Hãy tag kèm nội dung nhé!")
             return
 
-        # Gửi trạng thái "Đang suy nghĩ..." (Typing) vào đúng khung chat hiện tại
+        # Gửi hiệu ứng "Đang soạn tin nhắn..." vào đúng khung chat hiện tại (kể cả trong voice chat room)
         async with message.channel.typing():
             try:
-                # Gọi AI để sinh câu trả lời
-                response = ai_model.generate_content(user_query)
-                bot_reply = response.text
+                # Gọi API OpenAI với model bạn muốn
+                response = client.chat.completions.create(
+                    model="openai/gpt-oss-120b", # Hoặc tên model khác tùy nhà cung cấp hỗ trợ
+                    messages=[
+                        {"role": "system", "content": "Bạn là một trợ lý ảo thân thiện, thông minh, nói chuyện tự nhiên trong nhóm chat Discord."},
+                        {"role": "user", "content": user_query}
+                    ],
+                    max_tokens=500
+                )
+                bot_reply = response.choices[0].message.content
                 
-                # Gửi câu trả lời trực tiếp vào chính cái channel/khung chat đang hỏi
+                # Gửi câu trả lời trực tiếp vào đúng chỗ người dùng vừa hỏi
                 await message.channel.send(bot_reply)
             except Exception as e:
                 print(f"Lỗi AI trả lời: {e}")
-                await message.channel.send("Hic, AI đang lú quá chưa nghĩ ra câu trả lời!")
+                await message.channel.send("Hic, bot đang bị lỗi kết nối với trí tuệ nhân tạo rồi!")
         
-        return # Thoát luôn, không chạy tiếp phần từ khóa cũ nữa (hoặc bạn có thể giữ lại nếu muốn)
+        return
 
-    # (Tùy chọn) Vẫn giữ lại kho từ khóa cũ của bạn nếu muốn kết hợp cả hai
+    # Hệ thống từ khóa phản hồi nhanh kèm GIF (giữ nguyên như cũ của bạn)
     responses = {
-        "ngủ ngoan nhó": {"text": "gút nightt", "gif": "https://media4.giphy.com/media/ERYp5zU8seh9DvF0SH/giphy.gif"},
-        "ngu": {"text": "0 toxic", "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"},
-        "ilovu": {"text": "iu thíi", "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"},
-        "hay": {"text": "=))", "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"},
-        "chợ lớn": {"text": "Chợ lớn đang được Hưng đóng chiếm.(Canh cổng)"}
+        "ngủ ngoan nhó": {
+            "text": "gút nightt",
+            "gif": "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExa3p5ZTRqdmt4Ym9seHBpNnpxYnp1YjV6eDE1ZHRpNnF3Zm1rbHpwbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ERYp5zU8seh9DvF0SH/giphy.gif"
+        },
+        "ngu": {
+            "text": "0 toxic",
+            "gif": "https://media4.giphy.com/media/jrd4qbTLztjuc6QPtJ/giphy.gif"
+        },
+        "ilovu": {
+            "text": "iu thíi",
+            "gif": "https://media4.giphy.com/media/xE8oTRMyuYLmhFMQkl/giphy.gif"
+        },
+        "hay": {
+            "text": "=))",
+            "gif": "https://media.giphy.com/media/ZDrNXDgd1sluElGuWr/giphy.gif"
+        },
+        "chợ lớn": {
+            "text": "Chợ lớn đang được Hưng đóng chiếm.(Canh cổng)"
+        }
     }
 
     user_text = message.content.lower().strip()
@@ -94,18 +119,25 @@ async def on_message(message):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
+    # Giữ nguyên tính năng tự động kết nối lại phòng voice khi bot rớt mạng
     if member.id == bot.user.id:
         if before.channel is not None and after.channel is None:
+            print("Bot bị rớt khỏi phòng voice, đang tự động kết nối lại...")
             await asyncio.sleep(3)
             try:
                 channel = bot.get_channel(VOICE_CHANNEL_ID)
                 if channel:
                     await channel.connect()
+                    print("Đã kết nối lại vào phòng voice thành công!")
             except Exception as e:
-                print(f"Lỗi kết nối lại voice: {e}")
+                print(f"Lỗi tự động kết nối lại voice: {e}")
+        return
 
+# Khởi động web server phụ để giữ bot online trên Railway
 keep_alive()
 
 token = os.environ.get('TOKEN')
-if token:
+if not token:
+    print("LỖI: Chưa cấu hình biến TOKEN trên Railway!")
+else:
     bot.run(token)
