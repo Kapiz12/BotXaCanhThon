@@ -21,7 +21,7 @@ client = None
 if OPENAI_API_KEY:
     client = OpenAI(
         api_key=OPENAI_API_KEY,
-        base_url="https://openrouter.ai/api/v1"  # Bắt buộc khi dùng OpenRouter
+        base_url="https://openrouter.ai/api/v1"  
     )
 else:
     print("CẢNH BÁO: Chưa cấu hình OPENAI_API_KEY trên Railway!")
@@ -30,18 +30,16 @@ else:
 async def on_ready():
     print(f'Đã đăng nhập thành công: {bot.user}')
     
+    # Kết nối vào phòng voice ngay khi bật bot và CẮM LUÔN Ở ĐÓ
     channel = bot.get_channel(VOICE_CHANNEL_ID)
     if channel and isinstance(channel, discord.VoiceChannel):
         try:
             if existing_vc := discord.utils.get(bot.voice_clients, guild=channel.guild):
-                if existing_vc.is_connected():
-                    await existing_vc.move_to(channel)
-                else:
-                    await existing_vc.disconnect()
+                if not existing_vc.is_connected():
                     await channel.connect()
             else:
                 await channel.connect()
-            print(f'Đã kết nối vào phòng voice: {channel.name}')
+            print(f'Đã vào phòng voice và cắm chốt: {channel.name}')
         except Exception as e:
             print(f'Lỗi kết nối voice ban đầu: {e}')
 
@@ -56,14 +54,12 @@ async def on_message(message):
             await message.channel.send("Chưa cấu hình OPENAI_API_KEY trên hệ thống bạn ơi!")
             return
 
-        # Lọc bỏ phần tag bot để lấy nội dung câu hỏi
         user_query = message.content.replace(f'<@!{bot.user.id}>', '').replace(f'<@{bot.user.id}>', '').strip()
         
         if not user_query:
             await message.channel.send("Bạn muốn hỏi gì nào? Hãy tag kèm nội dung nhé!")
             return
 
-        # Gửi hiệu ứng "Đang soạn tin nhắn..." vào đúng khung chat hiện tại
         async with message.channel.typing():
             try:
                 response = client.chat.completions.create(
@@ -127,21 +123,18 @@ async def on_message(message):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    # Tự động dọn dẹp kết nối cũ và chui lại vào phòng voice khi bị rớt mạng / lỗi socket
+    # Chỉ tự động chui vào lại phòng voice khi bị đá ra ngoài / rớt mạng thực sự
     if member.id == bot.user.id:
         if before.channel is not None and after.channel is None:
-            print("Bot bị rớt khỏi phòng voice, đang dọn dẹp và kết nối lại...")
-            await asyncio.sleep(3)
+            print("Bot bị rớt khỏi phòng voice, đang kết nối lại ngay lập tức...")
+            await asyncio.sleep(2)
             try:
-                if before.channel.guild.voice_client:
-                    await before.channel.guild.voice_client.disconnect(force=True)
-                
                 channel = bot.get_channel(VOICE_CHANNEL_ID)
                 if channel:
                     await channel.connect()
-                    print("Đã kết nối lại vào phòng voice thành công!")
+                    print("Đã vào lại phòng voice thành công!")
             except Exception as e:
-                print(f"Lỗi tự động kết nối lại voice: {e}")
+                print(f"Lỗi kết nối lại voice: {e}")
         return
 
 # Khởi động web server phụ để giữ bot online 24/7 trên Railway
