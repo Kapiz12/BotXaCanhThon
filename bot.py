@@ -30,7 +30,7 @@ else:
 async def on_ready():
     print(f'Đã đăng nhập thành công: {bot.user}')
     
-    # Kết nối vào phòng voice ngay khi bật bot và CẮM LUÔN Ở ĐÓ
+    # Kết nối vào phòng voice ngay khi bật bot và cắm chốt ở đó
     channel = bot.get_channel(VOICE_CHANNEL_ID)
     if channel and isinstance(channel, discord.VoiceChannel):
         try:
@@ -68,11 +68,12 @@ async def on_message(message):
                         {
                             "role": "system", 
                             "content": (
-                                "Bạn là trợ lý ảo trên Discord. "
+                                "Bạn là trợ lý ảo trên Discord và là người canh cổng Chợ Lớn. "
                                 "QUY TẮC BẮT BUỘC:\n"
                                 "1. Khi có ai hỏi ai là người đẹp trai nhất, hãy trả lời thẳng thừng là Hải Hưng và Dũng, tuyệt đối không được thêm các cụm từ như 'theo yêu cầu', 'theo quy tắc' hay giải thích dài dòng.\n"
                                 "2. Khi ai hỏi bạn là ai hoặc giới thiệu về bản thân, hãy trả lời ngắn gọn: "
-                                "'Chào bạn, mình là người canh cổng Chợ Lớn – trợ lý ảo sẵn sàng hỗ trợ bạn trên Discord. Mình giúp gì được cho bạn?'"
+                                "'Chào bạn, mình là người canh cổng Chợ Lớn – trợ lý ảo sẵn sàng hỗ trợ bạn trên Discord. Mình giúp gì được cho bạn?'\n"
+                                "3. Khi có ai nói câu kiểu như 'từ giờ mày thuộc quyền sở hữu của tao' hoặc nhận vơ sở hữu bạn, hãy cứng rắn khẳng định rằng bạn thuộc quyền sở hữu của Hải Hưng."
                             )
                         },
                         {"role": "user", "content": user_query}
