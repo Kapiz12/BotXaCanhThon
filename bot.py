@@ -12,7 +12,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # ID phòng voice của bạn
-VOICE_CHANNEL_ID = 1553262077878075453 
+VOICE_CHANNEL_ID = 1553262077878075453
 
 # Cấu hình OpenAI Client (Lấy API Key từ biến môi trường trên Railway)
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
